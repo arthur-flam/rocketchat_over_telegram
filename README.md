@@ -19,7 +19,7 @@ pip install .
 | `ROCKETCHAT_USER_ID`/`ROCKETCHAT_USER_TOKEN` | Open RocketChat, open the devtools, and in the application data get your `user_id` and `user_token`                                                              |
 | `TELEGRAM_BOT_TOKEN` | Telegram gives it to you when you create the bot |
 | `TELEGRAM_USERNAME`  | You own telegram username, e.g. `@arthur_flam`   |
-| `TELEGRAM_BOTUSER_CHAT_ID` | Start a Telegram chat with your bot, then visit [https://api.telegram.org/bot<yourtoken>/getUpdates](https://api.telegram.org/bot<yourtoken>/getUpdates) to get the chat id.               |
+| `TELEGRAM_BOTUSER_CHAT_ID` | Start a Telegram chat with your bot, then visit [`https://api.telegram.org/bot<yourtoken>/getUpdates`](https://api.telegram.org/bot<yourtoken>/getUpdates) to get the chat id.               |
 
 
 ## Usage
