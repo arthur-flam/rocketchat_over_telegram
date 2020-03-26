@@ -2,6 +2,7 @@
 Why not! Especially if for some reason you can't use RocketChat's mobile application.
 
 ## Installation
+Assuming you have `python3.6`:
 ```bash
 git clone git@github.com/arthur-flam/rocketchat_over_telegram.git
 cd rocketchat_over_telegram
