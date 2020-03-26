@@ -38,6 +38,7 @@ pip install --editable .
 > Merge requests are very welcome!
 
 **Known bugs and Missing features include:**
+- Need support for images, with https://core.telegram.org/bots/api#sendphoto
 - Reply-to-message to continue in its thread, not in the last thread.
 - Some messages are duplicated (e.g. when users add reactions...)
 - Support for multiple users.
