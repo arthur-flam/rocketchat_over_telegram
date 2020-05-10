@@ -2,6 +2,7 @@
 Why not! Especially if for some reason you can't use RocketChat's mobile application.
 
 ## Installation
+Assuming you have `python3.6`:
 ```bash
 git clone git@github.com/arthur-flam/rocketchat_over_telegram.git
 cd rocketchat_over_telegram
@@ -19,7 +20,7 @@ pip install .
 | `ROCKETCHAT_USER_ID`/`ROCKETCHAT_USER_TOKEN` | Open RocketChat, open the devtools, and in the application data get your `user_id` and `user_token`                                                              |
 | `TELEGRAM_BOT_TOKEN` | Telegram gives it to you when you create the bot |
 | `TELEGRAM_USERNAME`  | You own telegram username, e.g. `@arthur_flam`   |
-| `TELEGRAM_BOTUSER_CHAT_ID` | Start a Telegram chat with your bot, then visit [https://api.telegram.org/bot<yourtoken>/getUpdates](https://api.telegram.org/bot<yourtoken>/getUpdates) to get the chat id.               |
+| `TELEGRAM_BOTUSER_CHAT_ID` | Start a Telegram chat with your bot, then visit [`https://api.telegram.org/bot<yourtoken>/getUpdates`](https://api.telegram.org/bot<yourtoken>/getUpdates) to get the chat id.               |
 
 
 ## Usage
@@ -37,8 +38,10 @@ pip install --editable .
 
 > Merge requests are very welcome!
 
-**Missing features include:**
+**Known bugs and Missing features include:**
+- Need support for images, with https://core.telegram.org/bots/api#sendphoto
 - Reply-to-message to continue in its thread, not in the last thread.
+- Some messages are duplicated (e.g. when users add reactions...)
 - Support for multiple users.
 - Do a login to RocketChat with the username/password to get the token/user_id.
 - Send notifications to telegram in case of auth errors.
