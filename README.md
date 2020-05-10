@@ -38,10 +38,10 @@ pip install --editable .
 
 > Merge requests are very welcome!
 
-**Known bugs and Missing features include:**
-- Need support for images, with https://core.telegram.org/bots/api#sendphoto
+**Missing features:**
 - Reply-to-message to continue in its thread, not in the last thread.
-- Some messages are duplicated (e.g. when users add reactions...)
+- Edit sent Telegram messages to indicate `unread` statuses, or add reactions without duplicates.
+- Display quoted messages as quoted messages
 - Support for multiple users.
 - Do a login to RocketChat with the username/password to get the token/user_id.
 - Send notifications to telegram in case of auth errors.
