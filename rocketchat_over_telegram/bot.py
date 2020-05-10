@@ -43,6 +43,8 @@ from .telegram import getUpdates as getUpdatesTelegram
 
 
 
+# https://github.com/encode/httpx/issues/859
+asyncio.log.logger.setLevel(40)
 
 rocket_ws = None
 rocket_last_chat_name = "#chat"
@@ -181,7 +183,10 @@ def start_bot(restart_always):
     while True:
       try:
         start_forwarder()
-      except:
+      except Exception as e:
+        import traceback
+        print(e)
+        traceback.print_exc()
         pass
   else:
     start_forwarder()

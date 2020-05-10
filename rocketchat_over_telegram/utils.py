@@ -9,12 +9,14 @@ def uuid() -> str:
 
 async def send(data, ws):
   data_str = json.dumps(data)
-  secho(f"> {data_str}", fg='magenta', bold=True)
+  if '"pong"' not in data_str:
+    secho(f"> {data_str}", fg='magenta', bold=True)
   await ws.send(data_str)
 
 async def recv(ws):
   resp = await ws.recv()
-  secho(f"< {resp}", fg='cyan')
+  if '"ping"' not in resp:
+    secho(f"< {resp}", fg='cyan')
   return json.loads(resp)
 
 def in_available_hours(time):
