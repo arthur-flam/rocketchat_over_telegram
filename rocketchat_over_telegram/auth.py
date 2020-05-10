@@ -1,7 +1,7 @@
 import os
 
-rocket_uri = os.environ['ROCKETCHAT_URI']
-rocket_uri = f"ws://{rocket_uri}/websocket"
+rocket_host = os.environ['ROCKETCHAT_URI']
+rocket_uri = f"ws://{rocket_host}/websocket"
 # read them from the web-based app
 rocket_user_id = os.environ['ROCKETCHAT_USER_ID']
 rocket_user_token = os.environ['ROCKETCHAT_USER_TOKEN']
