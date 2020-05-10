@@ -36,15 +36,16 @@ from .messages import (
   get_subscriptions_msg,
   status_codes,
 )
-from .auth import rocket_user_id, rocket_user_token, rocket_uri
+from .auth import rocket_user_id, rocket_user_token, rocket_host, rocket_uri
 
-from .telegram import sendMessage as sendTelegram
+from .telegram import sendImage, sendMessage as sendTelegram
 from .telegram import getUpdates as getUpdatesTelegram
 
 
 
 # https://github.com/encode/httpx/issues/859
 asyncio.log.logger.setLevel(40)
+
 
 rocket_ws = None
 rocket_last_chat_name = "#chat"
@@ -61,6 +62,10 @@ async def startRocketChat():
     rooms = [] # {_id, t, name/fname? if t!=d}, ?lastMesage.u.username/name
     # https://rocket.chat/docs/developer-guides/realtime-api/method-calls/get-subscriptions/
     subscriptions = [] # {rid, fname?, name}
+
+    known_messages = { # TODO: limit growth?
+      # "id": message,
+    }
 
     async with websockets.connect(rocket_uri) as ws:
         rocket_ws = ws
@@ -120,11 +125,12 @@ async def startRocketChat():
             messages = resp['fields']['args']
             # https://rocket.chat/docs/developer-guides/realtime-api/the-message-object/
             for m in messages:
-              if not m.get('rid') or not m.get('msg'):
+              # empty messages are used for images
+              if not m.get('rid') or 'msg' not in m:
                 continue
-              if m.get('t') in ['ul', 'uj']: # user left/join 
+              if m.get('t') in ['ul', 'uj']: # notifications for user left/join 
                 continue
-              print(m) # .attachments, .reactions, .alias
+              print(m)
 
               if m['u']['username'] != 'arthurf': # m.get('unread')
                 chat = [chat for chat in subscriptions if m['rid'] == chat['rid']]
@@ -136,8 +142,39 @@ async def startRocketChat():
                 rocket_last_chat_rid = m['rid']
                 # get sub with same rid....
                 username = m['u']['username']
-                notification = f"<u><b>#{chat_name} @{username}:</b></u> {m['msg']}"
-                await sendTelegram(notification)
+
+                ignore = False
+                if m['_id'] not in known_messages:
+                  known_messages[m['_id']] = m
+                else:
+                  # attachments reactions mentions unread alias...
+                  previous_message = known_messages[m['_id']]
+                  if previous_message['msg'] == m['msg'] and previous_message.get('attachments', '') == m.get('attachments', '') and previous_message.get('reactions', '') == m.get('reactions', ''):
+                    ignore = True
+                if not ignore:
+                  # Reactions format: https://github.com/RocketChat/Rocket.Chat.Android/issues/473
+                  if  m.get('reactions'):
+                    reactions = "\n\nReactions:"
+                    for emoji, usernames in m["reactions"].items():
+                      usernames = ' & '.join(usernames.get('usernames', []))
+                      reactions += f'\n{emoji}   {usernames}'
+                  else:
+                    reactions = ''
+                  if m.get('attachements'):
+                    for attachement in attachements:
+                      if not 'image_url' in attachement:
+                        continue
+                        async with httpx.AsyncClient() as client:
+                          r = await client.get(f"http://{rocket_host}/{attachement['image_url']}")
+                        await sendImage(
+                          photo=r.content,
+                          filename=attachement['image_url'].split('/')[-1],
+                          type=m.get('file', {}).get('type', 'image/png'), # wtf it's not in the attachement itself
+                          caption=f"{attachement['title']}\n{attachement['description']}"
+                        )
+                  # https://core.telegram.org/bots/api#sendphoto
+                  notification = f"<u><b>#{chat_name} @{username}:</b></u> {m['msg']}{reactions}"
+                  await sendTelegram(notification)
 
 
 async def startTelegram():

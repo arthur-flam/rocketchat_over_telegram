@@ -10,7 +10,6 @@ from .auth import telegram_bot_token, telegram_user_chat_id
 
 # https://core.telegram.org/bots/api#available-methods
 api_prefix = f"https://api.telegram.org/bot{telegram_bot_token}"
-uri_send = f"{api_prefix}/sendMessage"
 uri_revc = f"{api_prefix}/getUpdates"
 
 
@@ -18,7 +17,7 @@ async def sendMessage(text, chat_id=telegram_user_chat_id):
     secho(f"> {text}", fg="green")
     async with httpx.AsyncClient(verify=False) as client:
         r = await client.post(
-            uri_send,
+            f"{api_prefix}/sendMessage",
             data={
                 "chat_id": chat_id,
                 "text": text,
@@ -27,6 +26,27 @@ async def sendMessage(text, chat_id=telegram_user_chat_id):
         )
     secho(f"< {r.json()}", fg="green", bold=True)
     return r.json()
+
+
+async def sendImage(photo, file_name, file_type, caption, chat_id=telegram_user_chat_id):
+    secho(f">[IMG] {file_name}", fg="green")
+    files = {'upload-file': (file_name, photo, file_type)}
+    is_animation = 'gif' in file_type
+    uri = f"{api_prefix}/sendAnimation" if is_animation else f"{api_prefix}/sendImage"
+    async with httpx.AsyncClient(verify=False) as client:
+        r = await client.post(
+            uri,
+            data={
+                "chat_id": chat_id,
+                "caption": caption,
+                "parse_mode": "HTML",
+            },
+            files=files,
+        )
+    secho(f"< {r.json()}", fg="green", bold=True)
+    return r.json()
+
+
 
 
 data_dir = Path("data")
