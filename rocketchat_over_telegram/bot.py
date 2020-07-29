@@ -19,6 +19,8 @@ import asyncio
 from datetime import datetime, timedelta
 
 import websockets
+from emoji_data_python import replace_colons
+import httpx
 import click
 from click import secho
 
@@ -128,7 +130,9 @@ async def startRocketChat():
               # empty messages are used for images
               if not m.get('rid') or 'msg' not in m:
                 continue
-              if m.get('t') in ['ul', 'uj']: # notifications for user left/join 
+              if m.get('t') in ['ul', 'uj', 'au']: # notifications for user left/join, add-user 
+                continue
+              if m.get('type') in ['subscription-role-added']: # notifications for role: owner/leader... 
                 continue
               print(m)
 
@@ -154,26 +158,31 @@ async def startRocketChat():
                 if not ignore:
                   # Reactions format: https://github.com/RocketChat/Rocket.Chat.Android/issues/473
                   if  m.get('reactions'):
-                    reactions = "\n\nReactions:"
+                    reactions = "\n<i>nReactions:</i>"
                     for emoji, usernames in m["reactions"].items():
                       usernames = ' & '.join(usernames.get('usernames', []))
-                      reactions += f'\n{emoji}   {usernames}'
+                      reactions += f'\n{replace_colons(emoji)}   {usernames}'
                   else:
                     reactions = ''
-                  if m.get('attachements'):
-                    for attachement in attachements:
+                  if m.get("attachments"):
+                    for attachement in m["attachments"]:
                       if not 'image_url' in attachement:
                         continue
-                        async with httpx.AsyncClient() as client:
-                          r = await client.get(f"http://{rocket_host}/{attachement['image_url']}")
-                        await sendImage(
-                          photo=r.content,
-                          filename=attachement['image_url'].split('/')[-1],
-                          type=m.get('file', {}).get('type', 'image/png'), # wtf it's not in the attachement itself
-                          caption=f"{attachement['title']}\n{attachement['description']}"
-                        )
+                      headers = {
+                        "X-User-Id": rocket_user_id,
+                        "X-Auth-Token": rocket_user_token,
+                      }
+                      image_url = f"http://{rocket_host}{attachement['image_url']}"
+                      async with httpx.AsyncClient() as client:
+                        r = await client.get(image_url, headers=headers)
+                      await sendImage(
+                        photo=r.content,
+                        file_name=attachement['image_url'].split('/')[-1],
+                        file_type=m.get('file', {}).get('type', 'image/png'), # wtf it's not in the attachement itself
+                        caption=f"{attachement['title']}\n{attachement['description']}"
+                      )
                   # https://core.telegram.org/bots/api#sendphoto
-                  notification = f"<u><b>#{chat_name} @{username}:</b></u> {m['msg']}{reactions}"
+                  notification = f"<u><b>#{chat_name} @{username}:</b></u> {replace_colons(m['msg'])}{reactions}"
                   await sendTelegram(notification)
 
 

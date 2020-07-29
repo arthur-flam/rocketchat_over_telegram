@@ -30,6 +30,26 @@ async def sendMessage(text, chat_id=telegram_user_chat_id):
 
 async def sendImage(photo, file_name, file_type, caption, chat_id=telegram_user_chat_id):
     secho(f">[IMG] {file_name}", fg="green")
+    files = {'photo': (file_name, photo, file_type)}
+    is_animation = 'gif' in file_type
+    uri = f"{api_prefix}/sendAnimation" if is_animation else f"{api_prefix}/sendPhoto"
+    print(uri)
+    async with httpx.AsyncClient(verify=False) as client:
+        r = await client.post(
+            uri,
+            data={
+                "chat_id": str(chat_id),
+                "caption": caption,
+                "parse_mode": "HTML",
+            },
+            files=files,
+        )
+    secho(f"< {r.json()}", fg="green", bold=True)
+    return r.json()
+
+
+async def sendDocument(document, file_name, file_type, caption, chat_id=telegram_user_chat_id):
+    secho(f">[IMG] {file_name}", fg="green")
     files = {'upload-file': (file_name, photo, file_type)}
     is_animation = 'gif' in file_type
     uri = f"{api_prefix}/sendAnimation" if is_animation else f"{api_prefix}/sendImage"

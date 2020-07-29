@@ -17,6 +17,7 @@ setup(
     'httpx',
     'websockets',
     'click',
+    'emoji_data_python',
   ],
 
   entry_points='''
