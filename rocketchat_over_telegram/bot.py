@@ -158,7 +158,7 @@ async def startRocketChat():
                 if not ignore:
                   # Reactions format: https://github.com/RocketChat/Rocket.Chat.Android/issues/473
                   if  m.get('reactions'):
-                    reactions = "\n<i>nReactions:</i>"
+                    reactions = "\n<i>Reactions:</i>"
                     for emoji, usernames in m["reactions"].items():
                       usernames = ' & '.join(usernames.get('usernames', []))
                       reactions += f'\n{replace_colons(emoji)}   {usernames}'
